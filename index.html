@@ -3,18 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BubbleMenu — 白の小站</title>
+  <title>白の小站</title>
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="shortcut icon" href="/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="justapage" />
-<link rel="manifest" href="/site.webmanifest" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="justapage" />
+  <link rel="manifest" href="/site.webmanifest" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'JetBrains Mono', 'Courier New', monospace;
@@ -32,222 +31,194 @@
         rgba(0,255,65,0.03) 2px, rgba(0,255,65,0.03) 4px
       );
       pointer-events: none; z-index: 9997;
-    }body::after {
+    }
+
+    body::after {
       content: '';
       position: fixed; inset: 0;
-      background: radial-gradient(ellipse at center, transparent60%, rgba(0,0,0,0.7) 100%);
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
       pointer-events: none; z-index: 9996;
-    }
-
-    /*══ Nav Bar ══ */
-    .bubble-menu {
-      left: 0; right: 0; top: 2em;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 16px; padding: 0 2em; pointer-events: none; z-index: 200;
-    }
-    .bubble-menu.absolute { position: absolute; }
-    .bubble-menu .bubble {
-      --bubble-size: 48px;
-      height: var(--bubble-size); border-radius: 8px;
-      background: rgba(0,10,0,0.9);
-      border: 1px solid #00ff41;
-      box-shadow: 0 0 12px rgba(0,255,65,0.3), inset 0 0 8px rgba(0,255,65,0.05);
-      display: inline-flex; align-items: center; justify-content: center;
-      pointer-events: auto; will-change: transform;
-    }
-    .bubble-menu .lang-bubble {
-      padding: 0 14px; gap: 7px; cursor: pointer;
-      white-space: nowrap; min-width: var(--bubble-size);}
-    .bubble-menu .lang-bubble-icon { flex-shrink: 0; opacity: .6; }
-    .bubble-menu .lang-bubble-label {
-      font-size: .75rem; font-weight: 700; color: #00ff41;
-      letter-spacing: .1em; font-family: 'JetBrains Mono', monospace;
-    }
-    .bubble-menu .font-bubble { width: var(--bubble-size); cursor: pointer; }
-    .bubble-menu .font-bubble-label {
-      font-size: .85rem; font-weight: 700; color: #00ff41;
-      pointer-events: none; font-family: 'JetBrains Mono', monospace;
-    }
-    .bubble-menu .toggle-bubble { width: var(--bubble-size); }
-    .bubble-menu .menu-btn {
-      border: none; background: transparent; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; padding: 0; outline: none; width: 100%; height: 100%;
-    }
-    .bubble-menu .menu-line {
-      width: 20px; height: 1.5px; background: #00ff41; border-radius: 0; display: block;
-      transition: transform .35s cubic-bezier(.22,1,.36,1), opacity .35s ease;
-      transform-origin: center;
-      box-shadow: 0 0 4px rgba(0,255,65,0.6);
-    }
-    .bubble-menu .menu-line + .menu-line { margin-top: 5px; }
-    .bubble-menu .menu-btn.open .menu-line:first-child { transform: translateY(3.5px) rotate(45deg); }
-    .bubble-menu .menu-btn.open .menu-line:last-child  { transform: translateY(-3.5px) rotate(-45deg); }
-    @media (min-width: 768px) { .bubble-menu .bubble { --bubble-size: 52px; } }
-
-    /* ══ Popup panels ══ */
-    .popup-panel {
-      position: fixed; z-index: 10000;
-      background: rgba(0,8,0,0.97);
-      border: 1px solid #00ff41; border-radius: 6px;
-      padding: 6px; flex-direction: column; gap: 2px;
-      box-shadow: 0 0 20px rgba(0,255,65,0.25); min-width: 140px;
-      display: flex; opacity: 0; transform: translateY(-8px) scale(.95);
-      pointer-events: none; transform-origin: top center;
-      transition: opacity .2s ease, transform .2s ease;
-    }
-    .popup-panel.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-    .panel-opt {
-      padding: 7px 14px; border-radius: 4px; font-size: .78rem;
-      cursor: pointer; transition: background .12s, color .12s; color: #00cc33;
-      border: none; background: transparent; text-align: left;
-      font-family: 'JetBrains Mono', monospace; letter-spacing: .05em;
-    }
-    .panel-opt::before { content: '> '; opacity: 0; transition: opacity .12s; }
-    .panel-opt:hover::before, .panel-opt.active::before { opacity: 1; }
-    .panel-opt:hover { background: rgba(0,255,65,0.08); color: #00ff41; }
-    .panel-opt.active { color: #00ff41; background: rgba(0,255,65,0.12); }
-    .panel-opt[data-font="serif"]{ font-family: serif; }
-    .panel-opt[data-font="sans"]{ font-family: sans-serif; }
-    .panel-opt[data-font="zhengsung"] { font-family: "TW-Sung", serif; }
-
-    /* ══ Overlay / Pills ══ */
-    .bubble-menu-items {
-      inset: 0; display: none; align-items: center; justify-content: center;
-      pointer-events: none; z-index: 98;background: rgba(0,5,0,0.93);}
-    .bubble-menu-items.absolute { position: absolute; }
-    .bubble-menu-items .pill-list {
-      list-style: none; padding: 0 24px; display: flex; flex-wrap: wrap;
-      gap: 0; row-gap: 6px; width: 100%; max-width: 1200px;
-      margin: 0 auto; pointer-events: auto; justify-content: stretch;
-    }
-    .bubble-menu-items .pill-col {
-      display: flex; justify-content: center; align-items: stretch; flex: 0 0 calc(100% / 3);
-    }
-    .bubble-menu-items .pill-col:nth-child(4):nth-last-child(2) { margin-left: calc(100% / 6); }
-    .bubble-menu-items .pill-col:nth-child(4):last-child         { margin-left: calc(100% / 3); }
-    .bubble-menu-items .pill-link {
-      --pill-bg: rgba(0,12,0,0.9); --pill-color: #00ff41;
-      --item-rot: 0deg; --pill-min-h: 140px;
-      --active-bg: rgba(0,255,65,0.12); --active-color: #00ff41;
-      width: 100%; min-height: var(--pill-min-h);
-      padding: clamp(1.5rem,3vw,6rem) 0; font-size: clamp(1.2rem,3.5vw,3.5rem);
-      font-weight: 700; line-height: 0; border-radius: 6px;
-      background: var(--pill-bg); color: var(--pill-color);
-      border: 1px solid rgba(0,255,65,0.25);
-      box-shadow: 0 0 20px rgba(0,255,65,0.06);
-      display: flex; align-items: center; justify-content: center;
-      transition: background .3s, border-color .3s, box-shadow .3s;
-      will-change: transform; white-space: nowrap; overflow: hidden;
-      height: 10px; outline: none; cursor: pointer; user-select: none;
-      font-family: 'JetBrains Mono', monospace; letter-spacing: .05em;
-    }
-    .bubble-menu-items .pill-link.pill-active {
-      background: var(--active-bg) !important;
-      border-color: #00ff41 !important;
-      box-shadow: 0 0 30px rgba(0,255,65,0.2) !important;
-    }
-    .bubble-menu-items .pill-label {
-      display: inline-block; will-change: transform, opacity; height: 1.2em; line-height: 1.2;
-    }
-    @media (min-width: 900px) {
-      .bubble-menu-items .pill-link { transform: rotate(var(--item-rot)); }
-      .bubble-menu-items .pill-link.pill-active { transform: rotate(var(--item-rot)) scale(1.02); }
-      .bubble-menu-items .pill-link:active { transform: rotate(var(--item-rot)) scale(.96); }
-    }
-    @media (max-width: 899px) {
-      .bubble-menu-items { align-items: flex-start; padding-top: 120px; }
-      .bubble-menu-items .pill-list { row-gap: 10px; }
-      .bubble-menu-items .pill-col  { flex: 0 0 100%; margin-left: 0 !important; overflow: visible; }
-      .bubble-menu-items .pill-link { font-size: clamp(1rem,3vw,3rem); padding: clamp(1rem,2vw,2rem) 0; min-height: 72px; }
-      .bubble-menu-items .pill-link.pill-active { transform: scale(1.02); }
-      .bubble-menu-items .pill-link:active { transform: scale(.96); }
     }
 
     /* ══ Hero ══ */
     .hero {
       display: flex; flex-direction: column; align-items: center;
       justify-content: center; min-height: 100vh; text-align: center;
-      padding: 2rem; gap: 16px; position: relative; z-index: 1;
+      padding: 2rem; gap: 40px; position: relative; z-index: 1;
     }
 
-    /*终端窗口 */
+    /* ══ 终端窗口 ══ */
     .terminal-window {
-      background: rgba(0,8,0,0.9); border: 1px solid #00ff41; border-radius: 8px;
+      background: rgba(0,8,0,0.9);
+      border: 1px solid #00ff41;
+      border-radius: 8px;
       width: 100%; max-width: 560px;
       box-shadow: 0 0 40px rgba(0,255,65,0.15), 0 0 80px rgba(0,255,65,0.05);
-      overflow: hidden;}
+      overflow: hidden;
+    }
     .terminal-titlebar {
-      background: rgba(0,20,0,0.8); border-bottom: 1px solid rgba(0,255,65,0.2);
-      padding: 8px 14px; display: flex; align-items: center; gap: 8px;
+      background: rgba(0,20,0,0.8);
+      border-bottom: 1px solid rgba(0,255,65,0.2);
+      padding: 8px 14px;
+      display: flex; align-items: center; gap: 8px;
     }
     .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .terminal-dot.red{ background: #ff5f57; box-shadow: 0 0 4px #ff5f57; }
+    .terminal-dot.red    { background: #ff5f57; box-shadow: 0 0 4px #ff5f57; }
     .terminal-dot.yellow { background: #febc2e; box-shadow: 0 0 4px #febc2e; }
     .terminal-dot.green  { background: #28c840; box-shadow: 0 0 4px #28c840; }
     .terminal-title {
       flex: 1; text-align: center; font-size: .7rem;
-      color: rgba(0,255,65,0.4); font-family: 'JetBrains Mono', monospace; letter-spacing: .1em;
+      color: rgba(0,255,65,0.4);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: .1em;
     }
-    .terminal-body { padding: 20px 24px 24px; text-align: left; }
+    .terminal-body {
+      padding: 20px 24px 24px; text-align: left;
+    }
     .terminal-prompt {
       color: rgba(0,255,65,0.4); font-size: .8rem; margin-bottom: 8px;
       font-family: 'JetBrains Mono', monospace;
     }
     .terminal-prompt span { color: #00ff41; }
+    .terminal-sub {
+      margin-top: 12px; font-size: .9rem;
+      color: rgba(0,255,65,0.55);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: .03em; line-height: 1.6;
+    }
+    .terminal-sub::before { content: '// '; color: rgba(0,255,65,0.25); }
+
+    /* ══ 打字机 ══ */
     .typewriter-title {
       font-size: clamp(1.6rem,5vw,2.8rem); font-weight: 700; color: #00ff41;
-      font-family: 'JetBrains Mono', monospace; letter-spacing: .05em; line-height: 1.2;
-      text-shadow: 0 0 20px rgba(0,255,65,0.5); min-height: 1.4em;
-      display: flex; align-items: center;}
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: .05em; line-height: 1.2;
+      text-shadow: 0 0 20px rgba(0,255,65,0.5);
+      min-height: 1.4em;
+      display: flex; align-items: center;
+    }
     .cursor-blink {
       display: inline-block; width: 2px; height: 1em;
-      background: #00ff41; margin-left: 4px; vertical-align: middle;
+      background: #00ff41; margin-left: 4px;
       animation: blink .7s step-end infinite;
       box-shadow: 0 0 6px rgba(0,255,65,0.8);
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-    .terminal-sub {
-      margin-top: 12px; font-size: .9rem; color: rgba(0,255,65,0.55);
-      font-family: 'JetBrains Mono', monospace; letter-spacing: .03em; line-height: 1.6;
-    }
-    .terminal-sub::before { content: '// '; color: rgba(0,255,65,0.25); }
 
-    /* ══ Dock ══ */
-    .dock-section { display: flex; justify-content: center; align-items: center; padding: 32px 24px 0; }
-    .dock-outer { display: flex; align-items: flex-end; justify-content: center; height: 110px; }
-    .dock-panel {
-      display: flex; align-items: flex-end; gap: 8px;
-      background: rgba(0,8,0,0.85); border: 1px solid rgba(0,255,65,0.3);
-      border-radius: 10px; padding: 10px 12px;
-      box-shadow: 0 0 24px rgba(0,255,65,0.1);
+    /* ══ 图标滚动墙 ══ */
+    .scroll-terminal .terminal-body {
+      padding: 16px 0 20px;
+      overflow: hidden;
     }
-    .dock-item {
-      position: relative; display: inline-flex; align-items: center;
-      justify-content: center; border-radius: 6px;
-      background: rgba(0,15,0,0.9); border: 1px solid rgba(0,255,65,0.2);
-      box-shadow: 0 0 8px rgba(0,255,65,0.05);
-      cursor: pointer; outline: none; width: 52px; height: 52px; flex-shrink: 0;
-      transition: border-color .2s, box-shadow .2s;}
-    .dock-item:hover { border-color: rgba(0,255,65,0.7); box-shadow: 0 0 16px rgba(0,255,65,0.2); }
-    .dock-item svg {
-      width: 48%; height: 48%; stroke: #00ff41; fill: none;
-      stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; pointer-events: none;
+    .scroll-terminal .terminal-prompt { padding-left: 24px; }
+    .scroll-terminal .terminal-sub { padding-left: 24px; }
+    .scroll-track {
+      display: flex; width: max-content; gap: 20px; padding: 12px 0;
+    }
+    .scroll-row { overflow: hidden; position: relative; }
+    .scroll-row::before, .scroll-row::after {
+      content: '';
+      position: absolute; top: 0; bottom: 0; width: 60px;
+      z-index: 2; pointer-events: none;
+    }
+    .scroll-row::before { left: 0; background: linear-gradient(to right, rgba(0,8,0,0.95), transparent); }
+    .scroll-row::after  { right: 0; background: linear-gradient(to left, rgba(0,8,0,0.95), transparent); }
+    .scroll-track.left  { animation: scrollLeft  25s linear infinite; }
+    .scroll-track.right { animation: scrollRight 25s linear infinite; }
+    .scroll-track:hover { animation-play-state: paused; }
+    @keyframes scrollLeft  { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    @keyframes scrollRight { 0%{transform:translateX(-50%)} 100%{transform:translateX(0)} }
+    .icon-card {
+      flex-shrink: 0; width: 64px; height: 64px;
+      background: rgba(0,15,0,0.9);
+      border: 1px solid rgba(0,255,65,0.2); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 4px;
+      transition: border-color .2s, box-shadow .2s, transform .2s;
+      cursor: default;
+    }
+    .icon-card:hover {
+      border-color: #00ff41;
+      box-shadow: 0 0 16px rgba(0,255,65,0.3);
+      transform: translateY(-4px);
+    }
+    .icon-card svg {
+      width: 28px; height: 28px;
+      stroke: #00ff41; fill: none;
+      stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
       filter: drop-shadow(0 0 3px rgba(0,255,65,0.4));
     }
-    .dock-label {
-      position: absolute; bottom: calc(100% + 8px); left: 50%;
-      transform: translateX(-50%) translateY(4px);
-      background: rgba(0,8,0,0.95); border: 1px solid rgba(0,255,65,0.4);
-      color: #00ff41; font-size: .68rem; padding: 4px 10px; border-radius: 4px;
-      white-space: nowrap; pointer-events: none; opacity: 0;
-      transition: opacity .15s ease, transform .15s ease;
-      font-family: 'JetBrains Mono', monospace; letter-spacing: .08em;
+    .icon-card .icon-label {
+      font-size: .45rem; color: rgba(0,255,65,0.5);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: .05em;
     }
-    .dock-label::before { content: '> '; opacity: .5; }
-    .dock-item:hover .dock-label { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* 矩阵雨 */
+    /* ══ 假终端交互 ══ */
+    .fake-term-body { padding: 16px 24px 20px; }
+    .fake-term-output {
+      min-height: 120px; max-height: 220px; overflow-y: auto;
+      margin-bottom: 12px; font-size: .78rem; line-height: 1.7;
+      color: rgba(0,255,65,0.7);
+    }
+    .fake-term-output::-webkit-scrollbar { width: 4px; }
+    .fake-term-output::-webkit-scrollbar-track { background: transparent; }
+    .fake-term-output::-webkit-scrollbar-thumb { background: rgba(0,255,65,0.3); border-radius: 2px; }
+    .fake-term-output .out-line { opacity: 0; animation: fadeLine .3s forwards; }
+    @keyframes fadeLine { to { opacity: 1; } }
+    .fake-term-output .out-cmd  { color: #00ff41; }
+    .fake-term-output .out-info { color: rgba(0,255,65,0.5); }
+    .fake-term-output .out-err  { color: #ff5f57; }
+    .fake-term-input-row {
+      display: flex; align-items: center; gap: 6px;
+      border-top: 1px solid rgba(0,255,65,0.15); padding-top: 10px;
+    }
+    .fake-term-input-row label { color: #00ff41; font-size: .8rem; white-space: nowrap; }
+    .fake-term-input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: #00ff41; font-family: 'JetBrains Mono', monospace;
+      font-size: .8rem; caret-color: #00ff41;
+    }
+
+    /* ★ 新增：页面信息 Footer */
+    .site-footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid rgba(0,255,65,0.1);
+      padding: 32px 24px 40px;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 12px;
+    }
+    .footer-line {
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; flex-wrap: wrap;
+      font-size: .72rem; color: rgba(0,255,65,0.35);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: .05em;
+    }
+    .footer-line a {
+      color: rgba(0,255,65,0.5);
+      text-decoration: none;
+      transition: color .2s, text-shadow .2s;
+    }
+    .footer-line a:hover {
+      color: #00ff41;
+      text-shadow: 0 0 8px rgba(0,255,65,0.5);
+    }
+    .cf-icon {
+      display: inline-block; width: 18px; height: 14px;
+      vertical-align: middle; fill: rgba(0,255,65,0.5);
+      transition: fill .2s, filter .2s;
+    }
+    .footer-line a:hover .cf-icon {
+      fill: #00ff41;
+      filter: drop-shadow(0 0 4px rgba(0,255,65,0.6));
+    }
+    .footer-divider {
+      width: 40px; height: 1px;
+      background: rgba(0,255,65,0.1);
+    }
+
+    /* ══ 矩阵雨 ══ */
     #matrix-canvas {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       pointer-events: none; z-index: 0; opacity: 0.07;
@@ -258,38 +229,9 @@
 
 <canvas id="matrix-canvas"></canvas>
 
-<!-- Nav bar -->
-<nav class="bubble-menu absolute" aria-label="主导航">
-  <div id="langBubble" class="bubble lang-bubble" role="button" tabindex="0">
-    <svg class="lang-bubble-icon" width="14" height="14" fill="none" stroke="#00ff41" stroke-width="2" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 00020"/>
-    </svg>
-    <span class="lang-bubble-label" id="langBubbleLabel">简中</span>
-  </div>
-  <div id="fontBubble" class="bubble font-bubble" role="button" tabindex="0">
-    <span class="font-bubble-label" id="fontBubbleLabel">宋</span>
-  </div>
-  <button type="button" id="menuToggle" class="bubble toggle-bubble" aria-pressed="false">
-    <div class="menu-btn" id="menuBtn">
-      <span class="menu-line"></span>
-      <span class="menu-line"></span></div>
-  </button>
-</nav>
-
-<div id="langPanel" class="popup-panel">
-  <button class="panel-opt active" data-lang="zh">简体中文</button>
-  <button class="panel-opt" data-lang="en">English</button>
-</div>
-<div id="fontPanel" class="popup-panel">
-  <button class="panel-opt active" data-font="serif">思源宋体</button>
-  <button class="panel-opt" data-font="sans">思源黑体</button><button class="panel-opt" data-font="zhengsung">全字库正宋体</button>
-</div>
-
-<div id="bubbleOverlay" class="bubble-menu-items absolute" aria-hidden="true">
-  <ul class="pill-list" role="menu"></ul>
-</div>
-
 <main class="hero">
+
+  <!-- 终端 1：标题 -->
   <div class="terminal-window">
     <div class="terminal-titlebar">
       <div class="terminal-dot red"></div>
@@ -308,14 +250,67 @@
     </div>
   </div>
 
-  <div class="dock-section">
-    <div class="dock-outer">
-      <div class="dock-panel" id="dockPanel"></div>
-    </div></div>
+  <!-- 终端 2：图标滚动墙 -->
+  <div class="terminal-window scroll-terminal">
+    <div class="terminal-titlebar">
+      <div class="terminal-dot red"></div>
+      <div class="terminal-dot yellow"></div>
+      <div class="terminal-dot green"></div>
+      <div class="terminal-title">icons.sh — scrolling</div>
+    </div>
+    <div class="terminal-body">
+      <div class="terminal-prompt">
+        <span>root@goway</span>:~$&nbsp;./icons.sh --loop
+      </div>
+      <div class="scroll-row" id="row1"></div>
+      <div class="scroll-row" id="row2"></div>
+      <div class="terminal-sub">hello world</div>
+    </div>
+  </div>
+
+  <!-- 终端 3：命令交互 -->
+  <div class="terminal-window">
+    <div class="terminal-titlebar">
+      <div class="terminal-dot red"></div>
+      <div class="terminal-dot yellow"></div>
+      <div class="terminal-dot green"></div>
+      <div class="terminal-title">interactive — bash</div>
+    </div>
+    <div class="terminal-body fake-term-body">
+      <div class="fake-term-output" id="termOutput">
+        <div class="out-line out-info">输入 help 查看可用命令</div>
+      </div>
+      <div class="fake-term-input-row">
+        <label>❯</label>
+        <input class="fake-term-input" id="termInput" type="text"
+               placeholder="输入命令..." autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+  </div>
+
 </main>
 
+<!-- ★ 新增：页面信息 -->
+<footer class="site-footer">
+  <div class="footer-line">
+    <span>© 2025 白</span>
+    <span>·</span>
+    <span>Just a page</span>
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-line">
+    <span>已托管到</span>
+    <a href="https://www.cloudflare.com" target="_blank" rel="noopener noreferrer">
+      <svg class="cf-icon" viewBox="0 0 640 512" aria-label="Cloudflare">
+        <path d="M407.906,319.913l-230.8-2.928a4.58,4.58,0,0,1-3.632-1.926,4.648,4.648,0,0,1-.494-4.147,6.143,6.143,0,0,1,5.361-4.076L411.281,303.9c27.631-1.26,57.546-23.574,68.022-50.784l13.286-34.542a7.944,7.944,0,0,0,.524-2.936,7.735,7.735,0,0,0-.164-1.631A151.91,151.91,0,0,0,201.257,198.4,68.12,68.12,0,0,0,94.2,269.59C41.924,271.106,0,313.728,0,366.12a96.054,96.054,0,0,0,1.029,13.958,4.508,4.508,0,0,0,4.445,3.871l426.1.051c.043,0,.08-.019.122-.02a5.606,5.606,0,0,0,5.271-4l3.273-11.265c3.9-13.4,2.448-25.8-4.1-34.9C430.124,325.423,420.09,320.487,407.906,319.913ZM513.856,221.1c-2.141,0-4.271.062-6.391.164a3.771,3.771,0,0,0-3.324,2.653l-9.077,31.193c-3.9,13.4-2.449,25.786,4.1,34.89,6.02,8.4,16.054,13.323,28.238,13.9l49.2,2.939a4.491,4.491,0,0,1,3.51,1.894,4.64,4.64,0,0,1,.514,4.169,6.153,6.153,0,0,1-5.351,4.075l-51.125,2.939c-27.754,1.27-57.669,23.574-68.145,50.784l-3.695,9.606a2.716,2.716,0,0,0,2.427,3.68c.046,0,.088.017.136.017h175.91a4.69,4.69,0,0,0,4.539-3.37,124.807,124.807,0,0,0,4.682-34C640,277.3,583.524,221.1,513.856,221.1Z"/>
+      </svg>
+      Cloudflare
+    </a>
+  </div>
+</footer>
+
 <script>
-/*══ 矩阵雨 ══ */
+/* ══ 矩阵雨 ══ */
 (function(){
   var canvas = document.getElementById('matrix-canvas');
   var ctx = canvas.getContext('2d');
@@ -326,117 +321,139 @@
     canvas.height = window.innerHeight;
     cols = Math.floor(canvas.width / 16);
     drops = [];
-    for(var i=0;i<cols;i++) drops[i]=1;
+    for(var i = 0; i < cols; i++) drops[i] = 1;
   }
   resize();
   window.addEventListener('resize', resize);
   setInterval(function(){
-    ctx.fillStyle='rgba(0,0,0,0.05)';
-    ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#00ff41';
-    ctx.font='14px monospace';
-    for(var i=0;i<drops.length;i++){
-      var ch=chars[Math.floor(Math.random()*chars.length)];
-      ctx.fillText(ch,i*16,drops[i]*16);
-      if(drops[i]*16>canvas.height&&Math.random()>0.975) drops[i]=0;
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#00ff41';
+    ctx.font = '14px monospace';
+    for(var i = 0; i < drops.length; i++){
+      var ch = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(ch, i * 16, drops[i] * 16);
+      if(drops[i] * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
       drops[i]++;
     }
-  },50);
+  }, 50);
 })();
 
-/* ══ 主逻辑 —— 等GSAP 确认加载后再执行 ══ */
-window.addEventListener('load', function(){
-
-  var ITEMS = [
-    { key:'home',rotation:-8, activeColor:'rgba(0,255,65,0.15)' },
-    { key:'categories',rotation: 8, activeColor:'rgba(0,255,65,0.15)' },
-    { key:'tags',      rotation: 8, activeColor:'rgba(0,255,65,0.15)' },
-    { key:'archives',  rotation: 8, activeColor:'rgba(0,255,65,0.15)' },
-    { key:'about',     rotation:-8, activeColor:'rgba(0,255,65,0.15)' },
-  ];
-  var I18N = {
-    zh:{ home:'首页', categories:'分类', tags:'标签', archives:'归档', about:'关于', badge:'简中', heroSub:'这只是个页面' },
-    en:{ home:'Home', categories:'Categories', tags:'Tags', archives:'Archives', about:'About', badge:'EN', heroSub:'This is just a page' },
-  };
-  var FONTS = {
-    serif:{ family:'"Source Han Serif SC","Source Han Serif",serif', label:'宋' },
-    sans:      { family:'"Source Han Sans SC","Source Han Sans",sans-serif', label:'黑' },
-    zhengsung: { family:'"TW-Sung",serif', label:'正' },
-  };
-  var DOCK_DATA = [
-    { zh:'首页', en:'Home',icon:'home'},
-    { zh:'分类', en:'Categories', icon:'grid'    },
-    { zh:'标签', en:'Tags',       icon:'tag'     },
-    { zh:'归档', en:'Archives',   icon:'archive' },
-    { zh:'关于', en:'About',      icon:'user'    },
-  ];
-  var ICONS = {
-    home:    '<svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>',
-    grid:    '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
-    tag:     '<svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="#00ff41" stroke="none"/></svg>',
-    archive: '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="4" rx="1"/><path d="M4 8v11a1 1 0 001 1h14a1 1 0 001-1V8"/><path d="M10 12h4"/></svg>',
-    user:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
-  };
-
-  var MENU_BG= 'rgba(0,12,0,0.9)';
-  var MENU_COLOR = '#00ff41';
-  var EASE= 'back.out(1.5)';
-  var DUR= 0.45;
-  var STAGGER    = 0.09;
-
-  /* ── 面板工具 ── */
-  function positionPanel(panel, anchor){
-    var r = anchor.getBoundingClientRect();
-    var pw = panel.offsetWidth || 140;
-    var left = Math.max(8, Math.min(r.left + r.width/2 - pw/2, window.innerWidth - pw - 8));
-    panel.style.left = left + 'px';
-    panel.style.top  = (r.bottom + 10) + 'px';
+/* ══ 打字机 ══ */
+(function(){
+  var text = 'Just a page';
+  var el = document.getElementById('typewriterText');
+  var i = 0;
+  function type(){
+    if(i <= text.length){
+      el.textContent = text.substring(0, i);
+      i++;
+      setTimeout(type, 120);
+    }
   }
-  function openPanel(panel, anchor){ closeAllPanels(); positionPanel(panel, anchor); panel.classList.add('open'); }
-  function closeAllPanels(){
-    document.querySelectorAll('.popup-panel').forEach(function(p){ p.classList.remove('open'); });
+  setTimeout(type, 800);
+})();
+
+/* ══ 图标滚动墙 ══ */
+(function(){
+  var row1Icons = [
+    { label:'HTML',   svg:'<svg viewBox="0 0 24 24"><path d="M4 2l1.6 18L12 22l6.4-2L20 2H4z"/><path d="M16 8H8l.5 4h7l-.5 5-3 1-3-1-.2-2"/></svg>' },
+    { label:'CSS',    svg:'<svg viewBox="0 0 24 24"><path d="M4 2l1.6 18L12 22l6.4-2L20 2H4z"/><path d="M16 8H8l.2 3h7.2l-.5 5-3 1-3-1-.1-2"/></svg>' },
+    { label:'JS',     svg:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8c0 1-1 2-2.5 2M15 12c1-1.5 3-1.5 3.5 0s-.5 2.5-3.5 3"/></svg>' },
+    { label:'Python', svg:'<svg viewBox="0 0 24 24"><path d="M12 2c-3 0-5 1.5-5 4v2h5v1H6c-2 0-4 1.5-4 5s1 5 3 5h2v-3c0-2 1-4 4-4h5c2 0 3-1 3-3V6c0-2-2-4-5-4z"/><circle cx="9.5" cy="5.5" r="1" fill="#00ff41" stroke="none"/><path d="M12 22c3 0 5-1.5 5-4v-2h-5v-1h6c2 0 4-1.5 4-5s-1-5-3-5h-2v3c0 2-1 4-4 4h-5c-2 0-3 1-3 3v3c0 2 2 4 5 4z"/><circle cx="14.5" cy="18.5" r="1" fill="#00ff41" stroke="none"/></svg>' },
+    { label:'React',  svg:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>' },
+    { label:'Node',   svg:'<svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z"/><path d="M12 22V12"/><path d="M3 7l9 5 9-5"/></svg>' },
+    { label:'Git',    svg:'<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><path d="M6 8v10M8 6h8M18 8v4c0 2-2 4-4 4H6"/></svg>' },
+    { label:'Docker', svg:'<svg viewBox="0 0 24 24"><rect x="2" y="10" width="4" height="3" rx=".5"/><rect x="7" y="10" width="4" height="3" rx=".5"/><rect x="12" y="10" width="4" height="3" rx=".5"/><rect x="7" y="6" width="4" height="3" rx=".5"/><rect x="12" y="6" width="4" height="3" rx=".5"/><rect x="17" y="10" width="4" height="3" rx=".5"/><rect x="12" y="2" width="4" height="3" rx=".5"/><path d="M1 14c1 5 5 8 11 8 7 0 10-5 11-8"/></svg>' },
+    { label:'Linux',  svg:'<svg viewBox="0 0 24 24"><path d="M12 2C9 2 7 5 7 9c0 2-.5 3-2 5s-2 4 0 5c1 .5 2 0 3-1s2-1 4-1 3 0 4 1 2 1.5 3 1c2-1 1.5-3 0-5s-2-3-2-5c0-4-2-7-5-7z"/><circle cx="10" cy="8" r="1" fill="#00ff41" stroke="none"/><circle cx="14" cy="8" r="1" fill="#00ff41" stroke="none"/><path d="M10 11c1 1 3 1 4 0"/></svg>' },
+    { label:'Vim',    svg:'<svg viewBox="0 0 24 24"><path d="M3 2v20l9-10L3 2z"/><path d="M13 7h8M13 12h8M13 17h5"/></svg>' },
+  ];
+  var row2Icons = [
+    { label:'GitHub', svg:'<svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 4.4 2.9 8.2 6.8 9.5.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.8.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.2-.4-1.3.1-2.6 0 0 .8-.3 2.7 1a9.4 9.4 0 015 0c1.8-1.3 2.7-1 2.7-1 .5 1.3.2 2.4.1 2.6.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0022 12c0-5.5-4.5-10-10-10z"/></svg>' },
+    { label:'Twitter',svg:'<svg viewBox="0 0 24 24"><path d="M4 4l6.5 8.5L4 20h2l5.5-6.2L16 20h5l-7-9 6-7h-2l-5 5.7L9 4H4z"/></svg>' },
+    { label:'Discord',svg:'<svg viewBox="0 0 24 24"><path d="M9 12a1 1 0 100 2 1 1 0 000-2zM15 12a1 1 0 100 2 1 1 0 000-2z" fill="#00ff41" stroke="none"/><path d="M8 4c-1.5.5-2.8 1.3-4 2.5.5 5 2 9 5 12 1-.5 2-1 2.5-1.5.5.5 1.5 1 2.5 1.5 3-3 4.5-7 5-12-1.2-1.2-2.5-2-4-2.5l-1 2c-1-.3-2.5-.3-4 0l-1-2z"/></svg>' },
+    { label:'Mail',   svg:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 5l9 7 9-7"/></svg>' },
+    { label:'RSS',    svg:'<svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2" fill="#00ff41" stroke="none"/><path d="M4 11c4.5 0 9 3.5 9 9"/><path d="M4 4c9 0 16 7 16 16"/></svg>' },
+    { label:'API',    svg:'<svg viewBox="0 0 24 24"><path d="M4 12h4m8 0h4"/><circle cx="12" cy="12" r="4"/><path d="M12 4v4m0 8v4"/></svg>' },
+    { label:'DB',     svg:'<svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 10c0 1.7 3.6 3 8 3s8-1.3 8-3"/><path d="M4 15c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>' },
+    { label:'Cloud',  svg:'<svg viewBox="0 0 24 24"><path d="M6 19a4 4 0 01-.5-7.97A7 7 0 0118.5 11 4.5 4.5 0 0119 19H6z"/></svg>' },
+    { label:'Term',   svg:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8l4 4-4 4M13 16h4"/></svg>' },
+    { label:'Code',   svg:'<svg viewBox="0 0 24 24"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6M14 4l-4 16"/></svg>' },
+  ];
+  function buildTrack(icons, direction){
+    var all = icons.concat(icons);
+    var track = document.createElement('div');
+    track.className = 'scroll-track ' + direction;
+    all.forEach(function(icon){
+      var card = document.createElement('div');
+      card.className = 'icon-card';
+      card.innerHTML = icon.svg + '<span class="icon-label">' + icon.label + '</span>';
+      track.appendChild(card);
+    });
+    return track;
   }
-  document.addEventListener('click', closeAllPanels);
-  document.querySelectorAll('.popup-panel').forEach(function(p){
-    p.addEventListener('click', function(e){ e.stopPropagation(); });
-  });
+  document.getElementById('row1').appendChild(buildTrack(row1Icons, 'left'));
+  document.getElementById('row2').appendChild(buildTrack(row2Icons, 'right'));
+})();
 
-  /* ── Pills ── */
-  var pillList = document.querySelector('.pill-list');
-  var bubbles = [], labels = [], pillEls = [];
-  ITEMS.forEach(function(item){
-    var li  = document.createElement('li');
-    li.className = 'pill-col'; li.setAttribute('role','none');
-    var div = document.createElement('div');
-    div.className = 'pill-link';
-    div.setAttribute('role','menuitem'); div.setAttribute('tabindex','0');
-    div.style.setProperty('--item-rot', item.rotation + 'deg');
-    div.style.setProperty('--pill-bg',MENU_BG);
-    div.style.setProperty('--pill-color',  MENU_COLOR);
-    div.style.setProperty('--active-bg',   item.activeColor);
-    div.style.setProperty('--active-color','#00ff41');
-    var span = document.createElement('span');
-    span.className = 'pill-label';
-    div.appendChild(span); li.appendChild(div); pillList.appendChild(li);
-    bubbles.push(div); labels.push(span); pillEls.push(div);
-    div.addEventListener('click', function(){
-      var was = div.classList.contains('pill-active');
-      pillEls.forEach(function(el){ el.classList.remove('pill-active'); });
-      if(!was) div.classList.add('pill-active');
-    });
-    div.addEventListener('keydown', function(e){
-      if(e.key==='Enter'||e.key===' ') div.click();
-    });
-  });
-
-  /* ── 语言切换 ── */
-  var curLang = localStorage.getItem('chirpy-lang') || 'zh';
-  function applyLang(lang){
-    var map = I18N[lang] || I18N.zh;
-    labels.forEach(function(s,i){ s.textContent = map[ITEMS[i].key]; });
-    document.getElementById('langBubbleLabel').textContent = map.badge;
-    document.getElementById('heroSub').textContent         = map.heroSub;document.querySelectorAll('[data-lang]').forEach(function(b){
-      b.classList.toggle('active', b.dataset.lang === lang);
-    });
-    dockEls.forEach(function(item){
-      var label = item.el.querySelector('.dock-label');
-      if(label) label.textContent = lang==='en' ? ite
+/* ══ 终端命令交互 ══ */
+(function(){
+  var input  = document.getElementById('termInput');
+  var output = document.getElementById('termOutput');
+  var cmds = {
+    help: [
+      '可用命令:',
+      '  help     — 显示帮助',
+      '  about    — 关于我',
+      '  skills   — 技能列表',
+      '  projects — 项目',
+      '  echo     — 回显文字',
+      '  clear    — 清屏',
+      '  date     — 当前时间',
+      '  whoami   — 我是谁',
+      '  neofetch — 系统信息',
+    ],
+    about: [
+      '┌─────────────────────┐',
+      '│  白            │',
+      '│  開發          │',
+      '│  部署          │',
+      '└─────────────────────┘',
+    ],
+    skills: [
+      '[扫描中...]',
+      '  吃饭  ██████████  100%',
+      '  睡觉  ██████████  100%',
+      ' 上厕所  ██████████  100%',
+      '   玩   ██████████  100%',
+      ' 卖萌（）██████████  114514%',   
+    ],
+    projects: [
+      '> justapage  — 你正在看的这个页面',
+      '> api        — 模型中转',
+    ],
+    whoami: [
+      'root@goway',
+    ],
+    neofetch: [
+      '  ╭──────────╮',
+      '  │ ░░░░░░░░ │  OS: WebOS 1.0',
+      '  │ ░░████░░ │  Host: 浏览器',
+      '  │ ░░████░░ │  Kernel: JavaScript',
+      '  │ ░░░░░░░░ │  Shell: fake-bash',
+      '  ╰──────────╯  Theme: Matrix Green',
+    ],
+  };
+  function addLine(text, cls){
+    var d = document.createElement('div');
+    d.className = 'out-line ' + (cls || 'out-info');
+    d.textContent = text;
+    output.appendChild(d);
+    output.scrollTop = output.scrollHeight;
+  }
+  function typeLines(lines, i){
+    if(i >= lines.length) return;
+    addLine(lines[i], 'out-info');
+    setTimeout(function(){ typeLines(lines, i + 1); }, 60);
+  }
+  input.addEventListener('
